@@ -786,9 +786,9 @@ If stressed: "hey, I hear you — honestly the counseling center is actually rea
             sendBtn.disabled = false; userInput.disabled = false; userInput.focus();
         }
 
-        window.addEventListener('beforeunload', () => {
-            navigator.sendBeacon(`http://localhost:${SERVER_PORT}/shutdown`, '');
-        });
+        // window.addEventListener('beforeunload', () => {
+        //     navigator.sendBeacon(`http://localhost:${SERVER_PORT}/shutdown`, '');
+        // });
 
         // ── Init ──
         (function init() {
