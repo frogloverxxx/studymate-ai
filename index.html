@@ -373,7 +373,7 @@
                 <div class="top-actions">
                     <div class="mode-selector">
                         <select id="modeSelect" title="Switch mode" onchange="onModeChange()">
-                            <!-- <option value="azure-regular">Local &mdash; Regular</option> -->
+                            <option value="azure-regular">Local &mdash; Regular</option> 
                             <option value="azure-bro">Local &mdash; Bro Mode</option>
                             <option value="azure-sister">Local &mdash; Sister Mode</option>
                             <option value="azure-korean">Local &mdash; 한국어 모드</option>
@@ -507,18 +507,18 @@ If stressed: "hey, I hear you — honestly the counseling center is actually rea
         };
 
         const MODE_CONFIG = {
-            'local-regular': { label:'Regular',     badge:'regular', accentClass:'mode-regular' },
-            'local-bro':     { label:'Bro Mode',    badge:'bro',     accentClass:'mode-bro'     },
-            'local-sister':  { label:'Sister Mode',  badge:'sister',  accentClass:'mode-sister'  },
-            'local-korean':  { label:'한국어 모드',   badge:'korean',  accentClass:'mode-regular' },
+            'azure-regular': { label:'Regular',     badge:'regular', accentClass:'mode-regular' },
+            'azure-bro':     { label:'Bro Mode',    badge:'bro',     accentClass:'mode-bro'     },
+            'azure-sister':  { label:'Sister Mode',  badge:'sister',  accentClass:'mode-sister'  },
+            'azure-korean':  { label:'한국어 모드',   badge:'korean',  accentClass:'mode-regular' },
             'azure':         { label:'Azure',        badge:'regular', accentClass:'mode-regular' }
         };
 
         function getGreeting(user, mode) {
             const n = user.name.split(' ')[0];
-            if (mode === 'local-bro')    return `Ayo ${n}! WoosongMate in the building 🤜 What do you need bro?`;
-            if (mode === 'local-sister') return `Hey ${n}! 💕 I'm WoosongMate, your campus bestie. What's going on?`;
-            if (mode === 'local-korean') return `안녕하세요, <strong>${n}</strong> 씨! 저는 우송메이트예요 — 우송대학교 캠퍼스 AI 가이드랍니다. 수강신청, 시험 일정, 장학금, 캠퍼스 생활 등 뭐든지 물어보세요! 무엇이 궁금하신가요? 😊`;
+            if (mode === 'azure-bro')    return `Ayo ${n}! WoosongMate in the building 🤜 What do you need bro?`;
+            if (mode === 'azure-sister') return `Hey ${n}! 💕 I'm WoosongMate, your campus bestie. What's going on?`;
+            if (mode === 'azure-korean') return `안녕하세요, <strong>${n}</strong> 씨! 저는 우송메이트예요 — 우송대학교 캠퍼스 AI 가이드랍니다. 수강신청, 시험 일정, 장학금, 캠퍼스 생활 등 뭐든지 물어보세요! 무엇이 궁금하신가요? 😊`;
             return `Hello, <strong>${n}</strong>! I'm WoosongMate, your AI campus guide for Woosong University. What can I help you with today?`;
         }
 
