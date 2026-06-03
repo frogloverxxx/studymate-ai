@@ -785,7 +785,7 @@ If stressed: "hey, I hear you — honestly the counseling center is actually rea
             const text = userInput.value.trim();
             if (!text) return;
             const mode = document.getElementById('modeSelect').value;
-            if (mode==='azure' && (!AZURE_ENDPOINT||!API_KEY||!DEPLOYMENT_NAME)) {
+            if (!AZURE_ENDPOINT||!API_KEY||!DEPLOYMENT_NAME) {
                 addMessage('Azure is not configured. Switch to a Local mode to chat.', 'bot', true); return;
             }
             quickActions.style.display = 'none';
