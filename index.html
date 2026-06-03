@@ -507,7 +507,7 @@ If stressed: "hey, I hear you — honestly the counseling center is actually rea
         };
 
         const MODE_CONFIG = {
-            // 'local-regular': { label:'Regular',     badge:'regular', accentClass:'mode-regular' },
+            'local-regular': { label:'Regular',     badge:'regular', accentClass:'mode-regular' },
             'local-bro':     { label:'Bro Mode',    badge:'bro',     accentClass:'mode-bro'     },
             'local-sister':  { label:'Sister Mode',  badge:'sister',  accentClass:'mode-sister'  },
             'local-korean':  { label:'한국어 모드',   badge:'korean',  accentClass:'mode-regular' },
@@ -741,20 +741,20 @@ If stressed: "hey, I hear you — honestly the counseling center is actually rea
 
         // ── BYOM callModel ──
         async function callModel(messages) {
-    const res = await fetch(
-        ${AZURE_ENDPOINT}/openai/deployments/${DEPLOYMENT_NAME}/chat/completions?api-version=${API_VERSION},
-        {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'api-key': API_KEY
-            },
-            body: JSON.stringify({
-                messages,
-                max_completion_tokens: 800
-            })
-        }
-    );
+            const res = await fetch(
+                '${AZURE_ENDPOINT}/openai/deployments/${DEPLOYMENT_NAME}/chat/completions?api-version=${API_VERSION}',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'api-key': API_KEY
+                    },
+                    body: JSON.stringify({
+                        messages,
+                        max_completion_tokens: 800
+                    })
+                }
+            );
 
     const data = await res.json();
 
