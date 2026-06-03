@@ -755,10 +755,8 @@ If stressed: "hey, I hear you — honestly the counseling center is actually rea
                     })
                 }
             );
-
-    const data = await res.json();
-
-    return data.choices[0].message.content;
+            const data = await res.json();
+            return data.choices[0].message.content;
 }
         // async function callModel(messages) {
         //     const mode = document.getElementById('modeSelect').value;
