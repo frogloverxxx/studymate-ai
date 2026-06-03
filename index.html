@@ -742,7 +742,7 @@ If stressed: "hey, I hear you — honestly the counseling center is actually rea
         // ── BYOM callModel ──
         async function callModel(messages) {
             const res = await fetch(
-                ${AZURE_ENDPOINT}/openai/deployments/${DEPLOYMENT_NAME}/chat/completions?api-version=${API_VERSION},
+                '${AZURE_ENDPOINT}/openai/deployments/${DEPLOYMENT_NAME}/chat/completions?api-version=${API_VERSION}',
                 {
                     method: 'POST',
                     headers: {
