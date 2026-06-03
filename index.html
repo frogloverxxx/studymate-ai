@@ -632,29 +632,29 @@ If stressed: "hey, I hear you — honestly the counseling center is actually rea
         }
 
         // ── Ollama check ──
-        async function checkOllamaStatus() {
-            const el = document.getElementById('ollamaStatus');
-            const ov = document.getElementById('ollamaOverlay');
-            el.textContent = '⏳ Connecting...';
-            try {
-                const ctrl = new AbortController();
-                const t = setTimeout(()=>ctrl.abort(), 3000);
-                const res = await fetch('http://localhost:11434/api/tags', { signal: ctrl.signal });
-                clearTimeout(t);
-                if (res.ok) {
-                    el.textContent = '● Online';
-                    el.style.background = 'rgba(165,243,252,0.2)';
-                    el.style.borderColor = 'rgba(165,243,252,0.35)';
-                    ov.classList.add('hidden');
-                    return true;
-                }
-            } catch {}
-            el.textContent = '● Offline';
-            el.style.background = 'rgba(239,68,68,0.2)';
-            el.style.borderColor = 'rgba(239,68,68,0.35)';
-            ov.classList.remove('hidden');
-            return false;
-        }
+        // async function checkOllamaStatus() {
+        //     const el = document.getElementById('ollamaStatus');
+        //     const ov = document.getElementById('ollamaOverlay');
+        //     el.textContent = '⏳ Connecting...';
+        //     try {
+        //         const ctrl = new AbortController();
+        //         const t = setTimeout(()=>ctrl.abort(), 3000);
+        //         const res = await fetch('http://localhost:11434/api/tags', { signal: ctrl.signal });
+        //         clearTimeout(t);
+        //         if (res.ok) {
+        //             el.textContent = '● Online';
+        //             el.style.background = 'rgba(165,243,252,0.2)';
+        //             el.style.borderColor = 'rgba(165,243,252,0.35)';
+        //             ov.classList.add('hidden');
+        //             return true;
+        //         }
+        //     } catch {}
+        //     el.textContent = '● Offline';
+        //     el.style.background = 'rgba(239,68,68,0.2)';
+        //     el.style.borderColor = 'rgba(239,68,68,0.35)';
+        //     ov.classList.remove('hidden');
+        //     return false;
+        // }
 
         // ── Chat state ──
         let conversationHistory = [];
@@ -781,7 +781,7 @@ If stressed: "hey, I hear you — honestly the counseling center is actually rea
                 showTyping(false); addMessage(reply, 'bot');
             } catch(err) {
                 showTyping(false); addMessage(`Error: ${err.message}`, 'bot', true);
-                conversationHistory.pop(); checkOllamaStatus();
+                conversationHistory.pop(); // checkOllamaStatus();
             }
             sendBtn.disabled = false; userInput.disabled = false; userInput.focus();
         }
