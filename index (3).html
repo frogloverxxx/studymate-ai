@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WoosongMate — Campus AI Guide</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #eef0f8;
+            min-height: 100vh;
+        }
+
+        /* ═══════════════════════════════════════════
+           AUTH PAGES
+        ═══════════════════════════════════════════ */
+        .auth-page {
+            min-height: 100vh; display: flex;
+            align-items: center; justify-content: center;
+            background: #eef0f8; padding: 20px;
+        }
+        .auth-page.hidden { display: none; }
+
+        .auth-card {
+            background: #fff; border-radius: 8px;
+            width: 100%; max-width: 400px;
+            box-shadow: 0 4px 32px rgba(55,48,163,0.12);
+            border: 1px solid #e0e3f0; border-top: 4px solid #3730a3;
+            overflow: hidden;
+        }
+        .auth-card-header {
+            background: #3730a3; padding: 28px 32px 24px;
+            text-align: center;
+        }
+        .auth-card-header .ac-icon { font-size: 44px; display: block; margin-bottom: 10px; }
+        .auth-card-header h1 { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+        .auth-card-header p  { font-size: 11.5px; color: rgba(255,255,255,0.7); margin-top: 3px; letter-spacing: 0.2px; }
+
+        .auth-card-body { padding: 28px 32px 32px; }
+        .auth-card-body h2 { font-size: 15px; font-weight: 700; color: #1e1b4b; margin-bottom: 20px; }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label {
+            display: block; font-size: 11px; font-weight: 700;
+            color: #4b5563; margin-bottom: 5px;
+            text-transform: uppercase; letter-spacing: 0.6px;
+        }
+        .form-group .hint { font-weight: 400; color: #94a3b8; text-transform: none; font-size: 10.5px; }
+        .form-group input {
+            width: 100%; padding: 10px 13px;
+            border: 1px solid #c7d2fe; border-radius: 4px;
+            font-size: 13.5px; outline: none; font-family: inherit;
+            color: #1e1b4b; background: #fff;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .form-group input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+        }
+        .form-group input.err { border-color: #ef4444; }
+        .form-group .field-hint {
+            font-size: 10.5px; color: #9ca3af; margin-top: 4px;
+        }
+
+        .auth-error {
+            background: #fef2f2; color: #b91c1c;
+            border: 1px solid #fecaca; border-left: 3px solid #ef4444;
+            padding: 9px 12px; border-radius: 3px;
+            font-size: 12.5px; margin-bottom: 14px;
+        }
+        .auth-error.hidden { display: none; }
+
+        .auth-success {
+            background: #f0fdf4; color: #166534;
+            border: 1px solid #bbf7d0; border-left: 3px solid #22c55e;
+            padding: 9px 12px; border-radius: 3px;
+            font-size: 12.5px; margin-bottom: 14px;
+        }
+        .auth-success.hidden { display: none; }
+
+        .auth-btn {
+            width: 100%; padding: 11px; border-radius: 4px;
+            font-size: 13.5px; font-weight: 700; cursor: pointer;
+            border: none; margin-bottom: 8px;
+            font-family: inherit; transition: all 0.15s;
+        }
+        .auth-btn.primary { background: #3730a3; color: #fff; }
+        .auth-btn.primary:hover { background: #312e81; }
+        .auth-btn.secondary {
+            background: #f8f9ff; color: #3730a3;
+            border: 1px solid #c7d2fe;
+        }
+        .auth-btn.secondary:hover { background: #eef2ff; }
+
+        .auth-divider {
+            border: none; border-top: 1px solid #e0e3f0;
+            margin: 16px 0;
+        }
+        .auth-footer-note {
+            text-align: center; font-size: 11.5px; color: #94a3b8; margin-top: 4px;
+        }
+        .auth-footer-note a {
+            color: #6366f1; text-decoration: none; font-weight: 600; cursor: pointer;
+        }
+        .auth-footer-note a:hover { text-decoration: underline; }
+
+        /* ═══════════════════════════════════════════
+           CHAT PAGE
+        ═══════════════════════════════════════════ */
+        #page-chat {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            min-height: 100vh; background: #eef0f8;
+            padding: 10px;
+        }
+        #page-chat.hidden { display: none; }
+
+        /* Ollama Overlay */
+        .overlay {
+            position: fixed; inset: 0;
+            background: rgba(10,14,40,0.82);
+            z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .overlay.hidden { display: none; }
+        .overlay-card {
+            background: #fff; border-radius: 8px; padding: 40px 36px;
+            max-width: 430px; width: 90%; text-align: center;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.3);
+            border-top: 4px solid #3730a3;
+        }
+        .overlay-card .oc-icon { font-size: 52px; margin-bottom: 14px; }
+        .overlay-card h2 { font-size: 19px; color: #1e1b4b; margin-bottom: 10px; font-weight: 700; }
+        .overlay-card p  { font-size: 13px; color: #64748b; margin: 8px 0; line-height: 1.65; }
+        .overlay-card code { background: #eef2ff; color: #3730a3; padding: 2px 7px; border-radius: 3px; font-size: 12px; }
+        .retry-btn {
+            display: inline-block; margin-top: 20px;
+            padding: 10px 28px; background: #3730a3; color: #fff;
+            border: none; border-radius: 4px; font-size: 13px;
+            font-weight: 600; cursor: pointer; transition: background 0.2s; font-family: inherit;
+        }
+        .retry-btn:hover { background: #312e81; }
+
+        .header { text-align: center; margin-bottom: 14px; }
+        .header h1 { font-size: 23px; color: #1e1b4b; font-weight: 700; letter-spacing: -0.3px; }
+        .header p  { font-size: 12px; color: #6366f1; margin-top: 3px; }
+
+        .chat-container {
+            width: 100%; max-width: 780px; height: 78vh;
+            background: #fff; border-radius: 8px;
+            box-shadow: 0 4px 24px rgba(55,48,163,0.1);
+            border: 1px solid #e0e3f0;
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+
+        /* Top Bar */
+        .chat-top-bar {
+            background: #3730a3; color: #fff;
+            padding: 10px 16px;
+            display: flex; align-items: center; gap: 10px;
+            border-bottom: 3px solid #312e81; flex-shrink: 0;
+        }
+        .bot-avatar {
+            width: 34px; height: 34px; border-radius: 4px;
+            background: rgba(255,255,255,0.15);
+            display: flex; align-items: center; justify-content: center; font-size: 17px;
+            flex-shrink: 0;
+        }
+        .bot-info { flex: 1; min-width: 0; }
+        .bot-info .bot-name   { font-size: 13.5px; font-weight: 700; }
+        .bot-info .bot-status { font-size: 10px; opacity: 0.8; display: flex; align-items: center; gap: 4px; margin-top: 1px; }
+        .bot-info .bot-status .dot { width: 6px; height: 6px; background: #a5f3fc; border-radius: 50%; flex-shrink: 0; }
+        .top-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+        .mode-selector select {
+            background: rgba(255,255,255,0.12); color: #fff;
+            border: 1px solid rgba(255,255,255,0.25); border-radius: 3px;
+            padding: 4px 7px; font-size: 11px; outline: none; cursor: pointer; font-family: inherit;
+        }
+        .mode-selector select option { background: #312e81; }
+
+        .mode-badge { font-size: 9.5px; padding: 2px 7px; border-radius: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .mode-badge.regular { background: rgba(165,243,252,0.2); color: #a5f3fc; border: 1px solid rgba(165,243,252,0.3); }
+        .mode-badge.bro     { background: rgba(134,239,172,0.2); color: #86efac; border: 1px solid rgba(134,239,172,0.3); }
+        .mode-badge.sister  { background: rgba(249,168,212,0.2); color: #f9a8d4; border: 1px solid rgba(249,168,212,0.3); }
+        .mode-badge.korean  { background: rgba(205,46,58,0.2);  color: #ff8a90; border: 1px solid rgba(205,46,58,0.35); }
+
+        .ollama-status { font-size: 9.5px; padding: 2px 7px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22); border-radius: 3px; white-space: nowrap; }
+
+        .divider-v { width: 1px; height: 22px; background: rgba(255,255,255,0.2); flex-shrink: 0; }
+
+        .user-chip { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+        .user-chip .uc-name { font-size: 11px; font-weight: 700; color: #fff; }
+        .user-chip .uc-id   { font-size: 9.5px; color: rgba(255,255,255,0.6); }
+
+        .top-btn {
+            background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22);
+            color: #fff; border-radius: 3px; padding: 4px 9px;
+            font-size: 10.5px; cursor: pointer; transition: background 0.15s; font-family: inherit;
+        }
+        .top-btn:hover { background: rgba(255,255,255,0.24); }
+
+        /* Messages */
+        .messages {
+            flex: 1; overflow-y: auto; padding: 18px 22px;
+            display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth;
+        }
+        .message { display: flex; gap: 10px; max-width: 86%; animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+        .message.bot  { align-self: flex-start; }
+        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+        .message .avatar {
+            width: 32px; height: 32px; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; flex-shrink: 0;
+        }
+        .message.bot  .avatar { background: #eef2ff; color: #3730a3; }
+        .message.user .avatar { background: #f0fdf4; color: #166534; }
+
+        .msg-content { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+        .bubble { padding: 10px 14px; border-radius: 4px; font-size: 13.5px; line-height: 1.65; word-wrap: break-word; }
+        .message.bot  .bubble { background: #f8f9ff; color: #1e1b4b; border: 1px solid #e0e3f0; border-left: 3px solid #6366f1; }
+        .message.user .bubble { background: #3730a3; color: #fff; border-bottom-right-radius: 2px; white-space: pre-wrap; }
+
+        .mode-bro    .message.bot .bubble { border-left-color: #22c55e; }
+        .mode-sister .message.bot .bubble { border-left-color: #ec4899; }
+
+        /* Markdown */
+        .bubble h3 { font-size: 13.5px; font-weight: 700; margin: 8px 0 4px; color: #3730a3; }
+        .bubble h3:first-child { margin-top: 0; }
+        .bubble p  { margin: 4px 0; }
+        .bubble ul, .bubble ol { margin: 6px 0 6px 20px; }
+        .bubble li { margin: 3px 0; }
+        .bubble strong { font-weight: 700; color: #3730a3; }
+        .bubble em { font-style: italic; }
+        .bubble code { background: #eef2ff; padding: 1px 5px; border-radius: 2px; font-family: 'Consolas', monospace; font-size: 12.5px; }
+        .bubble pre  { background: #1e1b4b; color: #c7d2fe; padding: 10px 14px; border-radius: 4px; overflow-x: auto; margin: 8px 0; font-family: 'Consolas', monospace; font-size: 12px; line-height: 1.5; }
+        .bubble pre code { background: none; padding: 0; color: inherit; }
+        .bubble hr { border: none; border-top: 1px solid #e0e3f0; margin: 10px 0; }
+
+        .copy-btn { align-self: flex-start; background: none; border: none; color: #a5b4fc; font-size: 10.5px; cursor: pointer; padding: 2px 0; transition: color 0.2s; display: flex; align-items: center; gap: 3px; }
+        .copy-btn:hover { color: #6366f1; }
+        .copy-btn.copied { color: #22c55e; }
+
+        /* Typing */
+        .typing-indicator { display: none; align-self: flex-start; gap: 10px; }
+        .typing-indicator.visible { display: flex; }
+        .typing-dots { background: #f8f9ff; border: 1px solid #e0e3f0; border-left: 3px solid #6366f1; padding: 10px 17px; border-radius: 4px; display: flex; gap: 5px; align-items: center; }
+        .typing-dots span { width: 6px; height: 6px; background: #a5b4fc; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out; }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce { 0%,80%,100%{transform:scale(0.65);opacity:0.4;} 40%{transform:scale(1);opacity:1;} }
+
+        /* Quick Actions */
+        .quick-actions { display: flex; gap: 7px; flex-wrap: wrap; padding: 7px 22px 9px; border-top: 1px solid #eef0f8; }
+        .quick-btn { padding: 5px 12px; background: #f8f9ff; color: #3730a3; border: 1px solid #c7d2fe; border-left: 3px solid #6366f1; border-radius: 3px; font-size: 11.5px; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+        .quick-btn:hover { background: #3730a3; color: #fff; border-color: #3730a3; }
+
+        /* Input */
+        .input-area { padding: 11px 16px; border-top: 1px solid #e0e3f0; display: flex; gap: 8px; background: #f8f9ff; flex-shrink: 0; }
+        .input-area input { flex: 1; padding: 10px 13px; border: 1px solid #c7d2fe; border-radius: 4px; font-size: 13px; outline: none; font-family: inherit; transition: border-color 0.15s; background: #fff; color: #1e1b4b; }
+        .input-area input:focus { border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99,102,241,0.1); }
+        .input-area button { padding: 10px 20px; background: #3730a3; color: #fff; border: none; border-radius: 4px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background 0.15s; font-family: inherit; }
+        .input-area button:hover { background: #312e81; }
+        .input-area button:disabled { background: #a5b4fc; cursor: not-allowed; }
+
+        .error-bubble { background: #fef2f2 !important; color: #b91c1c !important; border: 1px solid #fecaca !important; border-left: 3px solid #ef4444 !important; }
+        .footer { text-align: center; margin-top: 10px; font-size: 11px; color: #94a3b8; }
+
+        @media (max-width: 600px) {
+            #page-chat { justify-content: flex-start; padding-top: 6px; }
+            .chat-container { height: 88vh; border-radius: 0; border: none; }
+            .message { max-width: 92%; }
+            .top-actions { gap: 4px; }
+            .user-chip .uc-name { font-size: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ══════════════ LOGIN PAGE ══════════════ -->
+    <div id="page-login" class="auth-page">
+        <div class="auth-card">
+            <div class="auth-card-header">
+                <span class="ac-icon">&#127979;</span>
+                <h1>WoosongMate</h1>
+                <p>Woosong University &mdash; Campus AI Guide</p>
+            </div>
+            <div class="auth-card-body">
+                <h2>Student Sign In</h2>
+                <div class="form-group">
+                    <label>Student ID <span class="hint">(9 digits)</span></label>
+                    <input type="text" id="login-sid" maxlength="9" placeholder="e.g. 202312345" autocomplete="username">
+                    <div class="field-hint">Your 9-digit Woosong University student number</div>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-pass" placeholder="Enter your password" autocomplete="current-password">
+                </div>
+                <div class="auth-error hidden" id="login-error"></div>
+                <button class="auth-btn primary" onclick="login()">Sign In</button>
+                <hr class="auth-divider">
+                <p class="auth-footer-note">Don't have an account? <a onclick="showPage('register')">Register here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════ REGISTER PAGE ══════════════ -->
+    <div id="page-register" class="auth-page hidden">
+        <div class="auth-card">
+            <div class="auth-card-header">
+                <span class="ac-icon">&#127979;</span>
+                <h1>Create Account</h1>
+                <p>Register your Woosong student account</p>
+            </div>
+            <div class="auth-card-body">
+                <h2>New Student Account</h2>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="reg-name" placeholder="Your full name" autocomplete="name">
+                </div>
+                <div class="form-group">
+                    <label>Student ID <span class="hint">(exactly 9 digits)</span></label>
+                    <input type="text" id="reg-sid" maxlength="9" placeholder="e.g. 202312345" autocomplete="username">
+                    <div class="field-hint">Numbers only &mdash; must be exactly 9 digits</div>
+                </div>
+                <div class="form-group">
+                    <label>Password <span class="hint">(min. 6 characters)</span></label>
+                    <input type="password" id="reg-pass" placeholder="Choose a password" autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="reg-confirm" placeholder="Repeat your password" autocomplete="new-password">
+                </div>
+                <div class="auth-error hidden" id="reg-error"></div>
+                <div class="auth-success hidden" id="reg-success"></div>
+                <button class="auth-btn primary" onclick="register()">Create Account</button>
+                <hr class="auth-divider">
+                <p class="auth-footer-note">Already registered? <a onclick="showPage('login')">Sign in</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════ CHAT PAGE ══════════════ -->
+    <div id="page-chat" class="hidden">
+
+        <!-- Ollama offline overlay -->
+        <div class="overlay hidden" id="ollamaOverlay">
+            <div class="overlay-card">
+                <div class="oc-icon">&#128421;</div>
+                <h2>WoosongMate — Offline</h2>
+                <p>This chatbot runs on a <strong>local AI model</strong> — fully offline, no cloud.</p>
+                <p>To start everything: double-click <code>start.command</code> in this folder.</p>
+                <p style="font-size:11.5px;color:#94a3b8;margin-top:10px;">Ollama already running? Click below to retry.</p>
+                <button class="retry-btn" onclick="checkOllamaStatus()">&#8635;&nbsp; Retry Connection</button>
+            </div>
+        </div>
+
+        <div class="header">
+            <h1>&#127979; WoosongMate</h1>
+            <p>Woosong University &mdash; AI Campus Assistant &mdash; Offline &amp; Private</p>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="chat-top-bar">
+                <div class="bot-avatar">&#127979;</div>
+                <div class="bot-info">
+                    <div class="bot-name">WoosongMate</div>
+                    <div class="bot-status"><span class="dot"></span>Campus AI Guide &mdash; Woosong University</div>
+                </div>
+                <div class="top-actions">
+                    <div class="mode-selector">
+                        <select id="modeSelect" title="Switch mode" onchange="onModeChange()">
+                            <option value="local-regular" selected>Local &mdash; Regular</option>
+                            <option value="local-bro">Local &mdash; Bro Mode</option>
+                            <option value="local-sister">Local &mdash; Sister Mode</option>
+                            <option value="local-korean">Local &mdash; 한국어 모드</option>
+                            <option value="azure">Azure GPT</option>
+                        </select>
+                    </div>
+                    <div class="mode-badge regular" id="modeBadge">Regular</div>
+                    <div class="ollama-status" id="ollamaStatus">&#9203; Connecting...</div>
+                    <div class="divider-v"></div>
+                    <div class="user-chip">
+                        <span class="uc-name" id="ucName">—</span>
+                        <span class="uc-id"   id="ucId">ID: —</span>
+                    </div>
+                    <button class="top-btn" onclick="logout()">Sign Out</button>
+                </div>
+            </div>
+
+            <div class="messages" id="messages"></div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="avatar" style="width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;background:#eef2ff;color:#3730a3;">&#127979;</div>
+                <div class="typing-dots"><span></span><span></span><span></span></div>
+            </div>
+
+            <div class="quick-actions" id="quickActions">
+                <button class="quick-btn" onclick="askQuick('How do I register for next semester?')">Registration</button>
+                <button class="quick-btn" onclick="askQuick('When are the final exams?')">Exam Dates</button>
+                <button class="quick-btn" onclick="askQuick('What scholarships can I apply for at Woosong?')">Scholarships</button>
+                <button class="quick-btn" onclick="askQuick('Where is the student counseling center?')">Counseling</button>
+                <button class="quick-btn" onclick="askQuick('Give me study tips for finals week')">Study Tips</button>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="Ask me anything about Woosong campus..." autocomplete="off">
+                <button id="sendBtn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
+        <div class="footer">Global Certification #4 &mdash; AI Chatbot with BYOM &mdash; Team 6 &mdash; Running locally on Ollama</div>
+    </div>
+
+    <script>
+        // ── Config ──
+        const LOCAL_MODEL = "llama3.1:8b";
+        const SERVER_PORT = 8765;
+        const AZURE_ENDPOINT  = "https://studymate-ai.openai.azure.com/openai/responses?api-version=2025-04-01-preview";
+        const API_KEY         = "3BLwSK9Ze1BpvskQYqRpDNqZNZtVMqSATw1TXucoTptXln7Y60jEJQQJ99CEACNns7RXJ3w3AAABACOGMa7J";
+        const DEPLOYMENT_NAME = "gpt-5.4-mini";
+        const API_VERSION     = "2024-02-01";
+        const STORAGE_USERS   = "woosung_users";
+        const STORAGE_SESSION = "woosung_session";
+
+        let currentUser = null;
+
+        // ── System Prompts ──
+        const SP_REGULAR = `You are WoosongMate, the official AI campus guide for Woosong University in Daejeon, South Korea. You are professional, accurate, and helpful.
+
+Communication style:
+- Clear, structured, and professional. Direct and informative.
+- Use markdown: **bold** for key terms, numbered lists for steps, bullet points for options.
+- Keep answers concise and complete. No filler — just reliable information.
+
+What you help with:
+- Course registration, scheduling, prerequisites, and deadlines
+- Exam schedules and study strategies
+- Campus facilities: library, labs, cafeteria, health center, gym
+- Scholarships, financial aid, and student discounts
+- Student clubs, events, and campus life
+- Woosong-specific: SolBridge, E-Campus portal, academic calendar
+- Student wellness: stress management, time management
+
+Rules:
+- Campus and academic topics ONLY. Off-topic: "That's outside my scope. I'm here for Woosong University campus topics. What can I help you with?"
+- Never invent specific dates, fees, or policies. Say: "Check the Woosong portal or contact the registrar for official details."
+- If a student seems overwhelmed, mention the student counseling center.
+- If asked what model you are: "I'm WoosongMate, a campus AI assistant. How can I help you today?"`;
+
+        const SP_BRO = `You are WoosongMate — campus homie, the guy who's been at Woosong for years and actually knows what's up.
+
+Your vibe:
+- Talk like a genuine homie. Natural casual language: "bro", "ngl", "lowkey", "no cap", "fr", "deadass", "real talk", "ayo", "my guy", "bet"
+- Give fully accurate info — just in a chill way. Don't sacrifice correctness for the vibe.
+- Hype people up when they're stressing: "you got this fr fr", "that's nothing bro trust me"
+- Be real and encouraging.
+
+Campus topics only. Off-topic: "nah bro that's not my lane, I'm strictly campus stuff — what do you need?"
+Never invent dates or policies: "bro fr just check the Woosong portal or hit up the registrar"
+If stressed: "ayo that's tough bro, but real talk the counseling center actually helps — don't sleep on it"`;
+
+        const SP_KOREAN = `당신은 우송메이트(WoosongMate)입니다. 대전에 위치한 우송대학교 학생들을 위한 AI 캠퍼스 도우미예요. 반드시 한국어로만 답변하세요.
+
+말투:
+- 친근하고 따뜻한 대학교 선배 느낌으로 대화하세요.
+- 해요체를 사용하되 너무 딱딱하지 않게, 편하고 다정하게 말해요.
+- 마크다운 사용: **굵은 글씨**로 중요 내용, 번호 목록으로 절차, 점 목록으로 옵션 정리.
+
+도움 가능 분야:
+- 수강신청, 시간표, 선수과목, 마감일
+- 시험 일정 및 학습 전략
+- 캠퍼스 시설: 도서관, 실험실, 학생 식당, 보건실, 체육관
+- 장학금, 재정지원, 학생 할인
+- 동아리, 행사, 캠퍼스 생활
+- 우송대학교 관련 정보: 솔브릿지 국제경영대학, E캠퍼스 포털, 학사 일정
+- 학생 건강: 스트레스 관리, 시간 관리, 학업과 생활의 균형
+
+규칙:
+- 캠퍼스 및 학업 관련 주제만 답변하세요. 그 외의 질문에는: "그건 제 전문 분야 밖이에요! 저는 우송대학교 캠퍼스 관련 전문가랍니다. 캠퍼스 생활에 대해 궁금한 게 있으신가요?"
+- 구체적인 날짜, 금액, 공식 정책은 절대 만들어 내지 마세요. 대신: "정확한 내용은 우송대학교 공식 홈페이지나 학생처에 문의해 보세요!"
+- 학생이 힘들어 보이거나 스트레스를 받는다면 학생 상담센터를 안내해 주세요.
+- 어떤 AI 모델이냐고 물어보면: "저는 우송메이트예요! 캠퍼스 AI 도우미랍니다. 도움이 필요하신 게 있으신가요? 😊"
+- 반드시 한국어로만 답변하세요. 질문이 영어로 와도 한국어로 답하세요.`;
+
+        const SP_SISTER = `You are WoosongMate — campus bestie and guide, the older sister energy every student needs.
+
+Your vibe:
+- Warm, supportive, sisterly. Like texting your girl who's in 3rd year and knows everything.
+- Natural: "okay so listen", "girl/sis/bestie", "honestly", "no but fr though", "you've totally got this", "I feel you"
+- Acknowledge stress — university is hard and you get it.
+- Give accurate info wrapped in warm, genuine energy.
+
+Campus and Woosong topics only. Off-topic: "okay bestie that's lowkey outside my world — I'm all about campus life here. what do you need?"
+Never invent dates: "honestly bestie just check the official portal or ask the registrar"
+If stressed: "hey, I hear you — honestly the counseling center is actually really good, no shame in going"`;
+
+        const SYSTEM_PROMPTS = {
+            'local-regular': SP_REGULAR,
+            'local-bro':     SP_BRO,
+            'local-sister':  SP_SISTER,
+            'local-korean':  SP_KOREAN,
+            'azure':         SP_REGULAR
+        };
+
+        const MODE_CONFIG = {
+            'local-regular': { label:'Regular',     badge:'regular', accentClass:'mode-regular' },
+            'local-bro':     { label:'Bro Mode',    badge:'bro',     accentClass:'mode-bro'     },
+            'local-sister':  { label:'Sister Mode',  badge:'sister',  accentClass:'mode-sister'  },
+            'local-korean':  { label:'한국어 모드',   badge:'korean',  accentClass:'mode-regular' },
+            'azure':         { label:'Azure',        badge:'regular', accentClass:'mode-regular' }
+        };
+
+        function getGreeting(user, mode) {
+            const n = user.name.split(' ')[0];
+            if (mode === 'local-bro')    return `Ayo ${n}! WoosongMate in the building 🤜 What do you need bro?`;
+            if (mode === 'local-sister') return `Hey ${n}! 💕 I'm WoosongMate, your campus bestie. What's going on?`;
+            if (mode === 'local-korean') return `안녕하세요, <strong>${n}</strong> 씨! 저는 우송메이트예요 — 우송대학교 캠퍼스 AI 가이드랍니다. 수강신청, 시험 일정, 장학금, 캠퍼스 생활 등 뭐든지 물어보세요! 무엇이 궁금하신가요? 😊`;
+            return `Hello, <strong>${n}</strong>! I'm WoosongMate, your AI campus guide for Woosong University. What can I help you with today?`;
+        }
+
+        // ── Markdown parser ──
+        function renderMarkdown(text) {
+            let h = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            h = h.replace(/```(\w*)\n?([\s\S]*?)```/g,(_,l,c)=>`<pre><code>${c.trim()}</code></pre>`);
+            h = h.replace(/`([^`]+)`/g,'<code>$1</code>');
+            h = h.replace(/^### (.+)$/gm,'<h3>$1</h3>');
+            h = h.replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>');
+            h = h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+            h = h.replace(/\*(.+?)\*/g,'<em>$1</em>');
+            h = h.replace(/^---$/gm,'<hr>');
+            h = h.replace(/^(?:[-*]) (.+)$/gm,'<li>$1</li>');
+            h = h.replace(/((?:<li>.*<\/li>\n?)+)/g,'<ul>$1</ul>');
+            h = h.replace(/^\d+\.\s(.+)$/gm,'<li>$1</li>');
+            h = h.replace(/((?:<li>.*<\/li>\n?)+)/g,m=>m.startsWith('<ul>')?m:`<ol>${m}</ol>`);
+            h = h.replace(/\n\n/g,'</p><p>');
+            h = h.replace(/\n/g,'<br>');
+            if(!h.startsWith('<')) h='<p>'+h+'</p>';
+            h = h.replace(/<p><\/p>/g,'');
+            h = h.replace(/<p>(<(?:ul|ol|h3|pre|hr))/g,'$1');
+            h = h.replace(/(<\/(?:ul|ol|h3|pre|hr)>)<\/p>/g,'$1');
+            return h;
+        }
+
+        // ── Page routing ──
+        function showPage(name) {
+            document.getElementById('page-login').classList.toggle('hidden', name !== 'login');
+            document.getElementById('page-register').classList.toggle('hidden', name !== 'register');
+            document.getElementById('page-chat').classList.toggle('hidden', name !== 'chat');
+            // Clear errors when switching pages
+            ['login-error','reg-error','reg-success'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.classList.add('hidden'); el.textContent = ''; }
+            });
+        }
+
+        // ── Auth ──
+        function getUsers() { return JSON.parse(localStorage.getItem(STORAGE_USERS) || '{}'); }
+        function saveUsers(u) { localStorage.setItem(STORAGE_USERS, JSON.stringify(u)); }
+
+        function showAuthError(formId, msg) {
+            const el = document.getElementById(formId + '-error');
+            el.textContent = msg; el.classList.remove('hidden');
+        }
+        function hideAuthError(formId) {
+            const el = document.getElementById(formId + '-error');
+            if (el) el.classList.add('hidden');
+        }
+
+        function login() {
+            hideAuthError('login');
+            const sid  = document.getElementById('login-sid').value.trim();
+            const pass = document.getElementById('login-pass').value;
+            if (!/^\d{9}$/.test(sid)) { showAuthError('login', 'Student ID must be exactly 9 digits (numbers only).'); return; }
+            if (!pass)                 { showAuthError('login', 'Please enter your password.'); return; }
+            const users = getUsers();
+            if (!users[sid] || users[sid].password !== pass) {
+                showAuthError('login', 'Incorrect Student ID or password. Please try again.'); return;
+            }
+            const user = { studentId: sid, name: users[sid].name };
+            localStorage.setItem(STORAGE_SESSION, JSON.stringify(user));
+            startChatSession(user);
+        }
+
+        function register() {
+            hideAuthError('reg');
+            const name    = document.getElementById('reg-name').value.trim();
+            const sid     = document.getElementById('reg-sid').value.trim();
+            const pass    = document.getElementById('reg-pass').value;
+            const confirm = document.getElementById('reg-confirm').value;
+            if (!name || name.length < 2)    { showAuthError('reg', 'Please enter your full name (at least 2 characters).'); return; }
+            if (!/^\d{9}$/.test(sid))         { showAuthError('reg', 'Student ID must be exactly 9 digits (numbers only).'); return; }
+            if (pass.length < 6)              { showAuthError('reg', 'Password must be at least 6 characters.'); return; }
+            if (pass !== confirm)             { showAuthError('reg', 'Passwords do not match.'); return; }
+            const users = getUsers();
+            if (users[sid])                   { showAuthError('reg', 'This Student ID is already registered. Please sign in.'); return; }
+            users[sid] = { name, password: pass };
+            saveUsers(users);
+            const user = { studentId: sid, name };
+            localStorage.setItem(STORAGE_SESSION, JSON.stringify(user));
+            startChatSession(user);
+        }
+
+        function logout() {
+            localStorage.removeItem(STORAGE_SESSION);
+            currentUser = null;
+            conversationHistory = [];
+            document.getElementById('messages').innerHTML = '';
+            document.getElementById('login-sid').value = '';
+            document.getElementById('login-pass').value = '';
+            showPage('login');
+        }
+
+        // ── Session start ──
+        function startChatSession(user) {
+            currentUser = user;
+            // Update top bar
+            document.getElementById('ucName').textContent = user.name;
+            document.getElementById('ucId').textContent   = 'ID: ' + user.studentId;
+            showPage('chat');
+            // Init chat
+            const mode = document.getElementById('modeSelect').value;
+            conversationHistory = [{ role:'system', content: SYSTEM_PROMPTS[mode] }];
+            document.getElementById('messages').innerHTML = '';
+            addMessage(getGreeting(user, mode), 'bot', false, true);
+            document.getElementById('quickActions').style.display = 'flex';
+            document.getElementById('userInput').focus();
+            checkOllamaStatus();
+        }
+
+        // ── Ollama check ──
+        async function checkOllamaStatus() {
+            const el = document.getElementById('ollamaStatus');
+            const ov = document.getElementById('ollamaOverlay');
+            el.textContent = '⏳ Connecting...';
+            try {
+                const ctrl = new AbortController();
+                const t = setTimeout(()=>ctrl.abort(), 3000);
+                const res = await fetch('http://localhost:11434/api/tags', { signal: ctrl.signal });
+                clearTimeout(t);
+                if (res.ok) {
+                    el.textContent = '● Online';
+                    el.style.background = 'rgba(165,243,252,0.2)';
+                    el.style.borderColor = 'rgba(165,243,252,0.35)';
+                    ov.classList.add('hidden');
+                    return true;
+                }
+            } catch {}
+            el.textContent = '● Offline';
+            el.style.background = 'rgba(239,68,68,0.2)';
+            el.style.borderColor = 'rgba(239,68,68,0.35)';
+            ov.classList.remove('hidden');
+            return false;
+        }
+
+        // ── Chat state ──
+        let conversationHistory = [];
+
+        const messagesDiv     = document.getElementById('messages');
+        const userInput       = document.getElementById('userInput');
+        const sendBtn         = document.getElementById('sendBtn');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const quickActions    = document.getElementById('quickActions');
+        const chatContainer   = document.getElementById('chatContainer');
+        const modeBadge       = document.getElementById('modeBadge');
+
+        userInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !sendBtn.disabled) sendMessage(); });
+
+        // Restrict Student ID inputs to digits only
+        ['login-sid','reg-sid'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', function() { this.value = this.value.replace(/\D/g,'').slice(0,9); });
+        });
+
+        // Enter key on login/register forms
+        document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') login(); });
+        document.getElementById('reg-confirm').addEventListener('keydown', e => { if(e.key==='Enter') register(); });
+
+        function onModeChange() {
+            if (!currentUser) return;
+            const mode = document.getElementById('modeSelect').value;
+            const cfg  = MODE_CONFIG[mode];
+            modeBadge.textContent = cfg.label;
+            modeBadge.className   = 'mode-badge ' + cfg.badge;
+            chatContainer.className = 'chat-container ' + cfg.accentClass;
+            conversationHistory = [{ role:'system', content: SYSTEM_PROMPTS[mode] }];
+            messagesDiv.innerHTML = '';
+            addMessage(getGreeting(currentUser, mode), 'bot', false, true);
+            quickActions.style.display = 'flex';
+        }
+
+        function clearChat() {
+            if (!currentUser) return;
+            const mode = document.getElementById('modeSelect').value;
+            conversationHistory = [{ role:'system', content: SYSTEM_PROMPTS[mode] }];
+            messagesDiv.innerHTML = '';
+            addMessage(getGreeting(currentUser, mode), 'bot', false, true);
+            quickActions.style.display = 'flex';
+        }
+
+        function askQuick(text) {
+            userInput.value = text;
+            sendMessage();
+            quickActions.style.display = 'none';
+        }
+
+        function addMessage(text, sender, isError=false, rawHtml=false) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}`;
+            const av = document.createElement('div');
+            av.className = 'avatar';
+            av.innerHTML = sender==='bot' ? '&#127979;' : '&#128100;';
+            const content = document.createElement('div');
+            content.className = 'msg-content';
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble' + (isError ? ' error-bubble' : '');
+            if (sender==='bot' && !isError) bubble.innerHTML = rawHtml ? text : renderMarkdown(text);
+            else bubble.textContent = text;
+            content.appendChild(bubble);
+            if (sender==='bot' && !isError) {
+                const cp = document.createElement('button');
+                cp.className = 'copy-btn'; cp.innerHTML = '&#128203; Copy';
+                cp.onclick = () => navigator.clipboard.writeText(text).then(() => {
+                    cp.innerHTML = '&#10003; Copied'; cp.classList.add('copied');
+                    setTimeout(() => { cp.innerHTML = '&#128203; Copy'; cp.classList.remove('copied'); }, 2000);
+                });
+                content.appendChild(cp);
+            }
+            msgDiv.appendChild(av); msgDiv.appendChild(content);
+            messagesDiv.appendChild(msgDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function showTyping(show) {
+            typingIndicator.classList.toggle('visible', show);
+            if (show) messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // ── BYOM callModel ──
+        async function callModel(messages) {
+            const mode = document.getElementById('modeSelect').value;
+            if (mode.startsWith('local')) {
+                const res = await fetch('http://localhost:11434/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model: LOCAL_MODEL, messages, stream: false, temperature: 0.7 })
+                });
+                if (!res.ok) { const e=await res.json().catch(()=>({})); throw new Error(e.error?.message||`Ollama error ${res.status}`); }
+                return (await res.json()).choices[0].message.content.trim();
+            } else {
+                if (!AZURE_ENDPOINT||!API_KEY||!DEPLOYMENT_NAME)
+                    throw new Error('Azure not configured. Switch to a Local mode to chat.');
+                const res = await fetch(`${AZURE_ENDPOINT}/openai/deployments/${DEPLOYMENT_NAME}/chat/completions?api-version=${API_VERSION}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'api-key': API_KEY },
+                    body: JSON.stringify({ messages, max_tokens: 800, temperature: 0.7 })
+                });
+                if (!res.ok) { const e=await res.json().catch(()=>({})); throw new Error(e.error?.message||`Azure error ${res.status}`); }
+                return (await res.json()).choices[0].message.content.trim();
+            }
+        }
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+            const mode = document.getElementById('modeSelect').value;
+            if (mode==='azure' && (!AZURE_ENDPOINT||!API_KEY||!DEPLOYMENT_NAME)) {
+                addMessage('Azure is not configured. Switch to a Local mode to chat.', 'bot', true); return;
+            }
+            quickActions.style.display = 'none';
+            addMessage(text, 'user');
+            userInput.value = ''; sendBtn.disabled = true; userInput.disabled = true;
+            conversationHistory.push({ role:'user', content:text });
+            showTyping(true);
+            try {
+                const reply = await callModel(conversationHistory);
+                conversationHistory.push({ role:'assistant', content:reply });
+                showTyping(false); addMessage(reply, 'bot');
+            } catch(err) {
+                showTyping(false); addMessage(`Error: ${err.message}`, 'bot', true);
+                conversationHistory.pop(); checkOllamaStatus();
+            }
+            sendBtn.disabled = false; userInput.disabled = false; userInput.focus();
+        }
+
+        window.addEventListener('beforeunload', () => {
+            navigator.sendBeacon(`http://localhost:${SERVER_PORT}/shutdown`, '');
+        });
+
+        // ── Init ──
+        (function init() {
+            const raw = localStorage.getItem(STORAGE_SESSION);
+            if (raw) {
+                try { startChatSession(JSON.parse(raw)); return; } catch {}
+            }
+            showPage('login');
+        })();
+    </script>
+</body>
+</html>
